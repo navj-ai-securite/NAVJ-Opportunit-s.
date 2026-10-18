@@ -1,18 +1,562 @@
-name: Extraire le projet
-on: workflow_dispatch
-permissions:
-  contents: write
-jobs:
-  extract:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: |
-          unzip -o NAVJ-projet-complet.zip -x 'navj/.github/*'
-          cp -r navj/. .
-          rm -rf navj NAVJ-projet-complet.zip
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add -A
-          git commit -m "Ajout du projet"
-          git push
+-- NAVJ OPPORTUNITÉS — Lot 1 : schéma, RLS, fonctions serveur
+-- Tarif officiel : 2000 FCFA / 30 jours. Ne pas modifier sans instruction du propriétaire.
+-- NON TESTÉ sur une base réelle : à exécuter dans Supabase > SQL Editor.
+
+create extension if not exists pgcrypto;
+
+-- ───────── Profils et rôles ─────────
+create table public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  display_name text check (char_length(display_name) <= 80),
+  role text not null default 'user' check (role in ('user','admin')),
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.handle_new_user() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id) values (new.id);
+  return new;
+end $$;
+
+create trigger on_auth_user_created after insert on auth.users
+for each row execute function public.handle_new_user();
+
+create or replace function public.is_admin() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
+$$;
+
+-- ───────── Paiements (vérification manuelle) ─────────
+create table public.payment_requests (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  transaction_ref text not null check (char_length(transaction_ref) between 4 and 64),
+  amount_fcfa integer not null default 2000 check (amount_fcfa = 2000),
+  payer_phone_last4 text check (payer_phone_last4 ~ '^[0-9]{4}$'),
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  reject_reason text,
+  reviewed_by uuid references auth.users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+-- Une référence de transaction ne peut servir qu'une fois
+create unique index payment_ref_unique on public.payment_requests (lower(transaction_ref));
+
+create table public.subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  payment_request_id uuid not null unique references public.payment_requests(id),
+  starts_at timestamptz not null,
+  expires_at timestamptz not null,
+  validated_by uuid not null references auth.users(id),
+  created_at timestamptz not null default now(),
+  check (expires_at > starts_at)
+);
+create index on public.subscriptions (user_id, expires_at desc);
+
+create table public.admin_logs (
+  id bigint generated always as identity primary key,
+  admin_id uuid not null references auth.users(id),
+  action text not null,
+  target_type text not null,
+  target_id text,
+  details jsonb,
+  created_at timestamptz not null default now()
+);
+
+-- Premium actif = abonnement validé ET non expiré (calculé à chaque appel, sans tâche planifiée)
+create or replace function public.has_premium(uid uuid default auth.uid()) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.subscriptions
+    where user_id = uid and starts_at <= now() and expires_at > now()
+  );
+$$;
+
+create or replace function public.my_premium_expiry() returns timestamptz
+language sql stable security definer set search_path = public as $$
+  select max(expires_at) from public.subscriptions
+  where user_id = auth.uid() and expires_at > now();
+$$;
+
+-- Approbation : seul un admin, une seule fois par demande
+-- Si un abonnement est encore actif, le nouveau commence à son expiration (pas de jours perdus).
+create or replace function public.approve_payment(req_id uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare r public.payment_requests; start_at timestamptz;
+begin
+  if not public.is_admin() then raise exception 'forbidden' using errcode = '42501'; end if;
+  select * into r from public.payment_requests where id = req_id for update;
+  if not found then raise exception 'not_found'; end if;
+  if r.status <> 'pending' then raise exception 'already_processed'; end if;
+
+  select greatest(now(), coalesce(max(expires_at), now())) into start_at
+  from public.subscriptions where user_id = r.user_id;
+
+  insert into public.subscriptions (user_id, payment_request_id, starts_at, expires_at, validated_by)
+  values (r.user_id, r.id, start_at, start_at + interval '30 days', auth.uid());
+
+  update public.payment_requests
+  set status = 'approved', reviewed_by = auth.uid(), reviewed_at = now()
+  where id = r.id;
+
+  insert into public.admin_logs (admin_id, action, target_type, target_id, details)
+  values (auth.uid(), 'approve_payment', 'payment_request', r.id::text,
+          jsonb_build_object('user_id', r.user_id, 'ref', r.transaction_ref));
+end $$;
+
+create or replace function public.reject_payment(req_id uuid, reason text) returns void
+language plpgsql security definer set search_path = public as $$
+declare r public.payment_requests;
+begin
+  if not public.is_admin() then raise exception 'forbidden' using errcode = '42501'; end if;
+  select * into r from public.payment_requests where id = req_id for update;
+  if not found then raise exception 'not_found'; end if;
+  if r.status <> 'pending' then raise exception 'already_processed'; end if;
+
+  update public.payment_requests
+  set status = 'rejected', reject_reason = left(reason, 300),
+      reviewed_by = auth.uid(), reviewed_at = now()
+  where id = r.id;
+
+  insert into public.admin_logs (admin_id, action, target_type, target_id, details)
+  values (auth.uid(), 'reject_payment', 'payment_request', r.id::text,
+          jsonb_build_object('reason', left(reason, 300)));
+end $$;
+
+-- ───────── Fournisseurs / plateformes ─────────
+create table public.suppliers (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  categories text[] not null default '{}',
+  countries text[] not null default '{}',
+  purchase_conditions text,
+  min_quantity text,
+  delivery_info text,
+  url text check (url ~ '^https://'),
+  last_verified_at date,
+  verification_level text not null default 'unverified'
+    check (verification_level in ('known_platform','verified_seller','unverified')),
+  warnings text,
+  is_premium boolean not null default false,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table public.reports (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  supplier_id uuid references public.suppliers(id) on delete set null,
+  kind text not null check (kind in ('suspicious_link','incorrect_info','other')),
+  message text not null check (char_length(message) between 5 and 1000),
+  status text not null default 'open' check (status in ('open','closed')),
+  created_at timestamptz not null default now()
+);
+
+-- ───────── Espace personnel ─────────
+create table public.favorites (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  supplier_id uuid not null references public.suppliers(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, supplier_id)
+);
+
+create table public.goals (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null check (char_length(title) between 1 and 120),
+  target_fcfa integer check (target_fcfa >= 0),
+  due_date date,
+  done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create table public.search_history (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  query text not null check (char_length(query) <= 120),
+  created_at timestamptz not null default now()
+);
+
+-- ───────── RLS ─────────
+alter table public.profiles enable row level security;
+alter table public.payment_requests enable row level security;
+alter table public.subscriptions enable row level security;
+alter table public.admin_logs enable row level security;
+alter table public.suppliers enable row level security;
+alter table public.reports enable row level security;
+alter table public.favorites enable row level security;
+alter table public.goals enable row level security;
+alter table public.search_history enable row level security;
+
+-- profiles : lecture de son profil ; modification limitée au nom (le rôle est protégé par GRANT de colonne)
+create policy profiles_select on public.profiles for select using (id = auth.uid() or public.is_admin());
+create policy profiles_update on public.profiles for update using (id = auth.uid()) with check (id = auth.uid());
+revoke update on public.profiles from authenticated, anon;
+grant update (display_name) on public.profiles to authenticated;
+
+-- paiements : l'utilisateur crée une demande « pending » ; aucune mise à jour directe (fonctions uniquement)
+create policy pay_select on public.payment_requests for select using (user_id = auth.uid() or public.is_admin());
+create policy pay_insert on public.payment_requests for insert
+  with check (user_id = auth.uid() and status = 'pending' and reviewed_by is null);
+
+-- abonnements et journaux : lecture seule ; écriture uniquement via fonctions security definer
+create policy sub_select on public.subscriptions for select using (user_id = auth.uid() or public.is_admin());
+create policy logs_select on public.admin_logs for select using (public.is_admin());
+
+-- fournisseurs : le contenu Premium est filtré côté serveur
+create policy sup_select on public.suppliers for select using (
+  public.is_admin() or (is_active and (not is_premium or public.has_premium()))
+);
+create policy sup_admin_write on public.suppliers for all using (public.is_admin()) with check (public.is_admin());
+
+-- signalements
+create policy rep_insert on public.reports for insert with check (user_id = auth.uid());
+create policy rep_select on public.reports for select using (user_id = auth.uid() or public.is_admin());
+create policy rep_admin_update on public.reports for update using (public.is_admin()) with check (public.is_admin());
+
+-- données personnelles : propriétaire uniquement
+create policy fav_all on public.favorites for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy goals_all on public.goals for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy hist_all on public.search_history for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Droits d'exécution des fonctions sensibles
+revoke all on function public.approve_payment(uuid) from public, anon;
+revoke all on function public.reject_payment(uuid, text) from public, anon;
+grant execute on function public.approve_payment(uuid) to authenticated;
+grant execute on function public.reject_payment(uuid, text) to authenticated;
+
+-- ───────── Premier administrateur (À FAIRE MANUELLEMENT) ─────────
+-- 1. Créez d'abord votre compte via l'application (e-mail + mot de passe fort).
+-- 2. Puis exécutez UNE fois dans le SQL Editor :
+--    update public.profiles set role = 'admin'
+--    where id = (select id from auth.users where email = 'navjboutique225@gmail.com');
+-- Lot 2 : plateformes connues. Aucune condition, aucun prix, aucune date de vérification n'est inventé.
+-- L'admin renseignera conditions et date de vérification après contrôle réel.
+insert into public.suppliers (name, description, categories, countries, url, verification_level, warnings) values
+('Jumia Côte d''Ivoire', 'Place de marché en ligne généraliste.', '{"Électronique et accessoires","Téléphones et informatique","Mode et beauté","Maison et équipements","Vente au détail"}', '{"Côte d''Ivoire"}', 'https://www.jumia.ci', 'known_platform', 'Les vendeurs sont des tiers : vérifiez l''avis, le délai et la politique de retour avant d''acheter.'),
+('Alibaba.com', 'Plateforme internationale orientée achat en gros auprès de fabricants et grossistes.', '{"Achat en gros","Fournitures professionnelles","Électronique et accessoires"}', '{}', 'https://www.alibaba.com', 'known_platform', 'Quantités minimales, transport et douane varient selon le vendeur. Demandez un devis complet et évitez de payer hors plateforme.'),
+('AliExpress', 'Place de marché internationale, souvent utilisée pour acheter à l''unité ou en petites quantités.', '{"Électronique et accessoires","Téléphones et informatique","Mode et beauté","Maison et équipements","Vente au détail"}', '{}', 'https://www.aliexpress.com', 'known_platform', 'Délais, frais de livraison et droits de douane vers la Côte d''Ivoire non vérifiés par NAVJ : consultez la plateforme avant de commander.');
+{
+  "name": "navj-opportunites",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "tsc --noEmit && vite build", "preview": "vite preview", "test": "node --experimental-strip-types --test tests/*.test.ts" },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "typescript": "5.5.4",
+    "vite": "5.4.8"
+  }
+}
+{
+  "name": "navj-opportunites",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "tsc --noEmit && vite build", "preview": "vite preview", "test": "node --experimental-strip-types --test tests/*.test.ts" },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "typescript": "5.5.4",
+    "vite": "5.4.8"
+  }
+}
+-- NAVJ OPPORTUNITÉS — Lot 1 : schéma, RLS, fonctions serveur
+-- Tarif officiel : 2000 FCFA / 30 jours. Ne pas modifier sans instruction du propriétaire.
+-- NON TESTÉ sur une base réelle : à exécuter dans Supabase > SQL Editor.
+
+create extension if not exists pgcrypto;
+
+-- ───────── Profils et rôles ─────────
+create table public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  display_name text check (char_length(display_name) <= 80),
+  role text not null default 'user' check (role in ('user','admin')),
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.handle_new_user() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id) values (new.id);
+  return new;
+end $$;
+
+create trigger on_auth_user_created after insert on auth.users
+for each row execute function public.handle_new_user();
+
+create or replace function public.is_admin() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
+$$;
+
+-- ───────── Paiements (vérification manuelle) ─────────
+create table public.payment_requests (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  transaction_ref text not null check (char_length(transaction_ref) between 4 and 64),
+  amount_fcfa integer not null default 2000 check (amount_fcfa = 2000),
+  payer_phone_last4 text check (payer_phone_last4 ~ '^[0-9]{4}$'),
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  reject_reason text,
+  reviewed_by uuid references auth.users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+-- Une référence de transaction ne peut servir qu'une fois
+create unique index payment_ref_unique on public.payment_requests (lower(transaction_ref));
+
+create table public.subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  payment_request_id uuid not null unique references public.payment_requests(id),
+  starts_at timestamptz not null,
+  expires_at timestamptz not null,
+  validated_by uuid not null references auth.users(id),
+  created_at timestamptz not null default now(),
+  check (expires_at > starts_at)
+);
+create index on public.subscriptions (user_id, expires_at desc);
+
+create table public.admin_logs (
+  id bigint generated always as identity primary key,
+  admin_id uuid not null references auth.users(id),
+  action text not null,
+  target_type text not null,
+  target_id text,
+  details jsonb,
+  created_at timestamptz not null default now()
+);
+
+-- Premium actif = abonnement validé ET non expiré (calculé à chaque appel, sans tâche planifiée)
+create or replace function public.has_premium(uid uuid default auth.uid()) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.subscriptions
+    where user_id = uid and starts_at <= now() and expires_at > now()
+  );
+$$;
+
+create or replace function public.my_premium_expiry() returns timestamptz
+language sql stable security definer set search_path = public as $$
+  select max(expires_at) from public.subscriptions
+  where user_id = auth.uid() and expires_at > now();
+$$;
+
+-- Approbation : seul un admin, une seule fois par demande
+-- Si un abonnement est encore actif, le nouveau commence à son expiration (pas de jours perdus).
+create or replace function public.approve_payment(req_id uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare r public.payment_requests; start_at timestamptz;
+begin
+  if not public.is_admin() then raise exception 'forbidden' using errcode = '42501'; end if;
+  select * into r from public.payment_requests where id = req_id for update;
+  if not found then raise exception 'not_found'; end if;
+  if r.status <> 'pending' then raise exception 'already_processed'; end if;
+
+  select greatest(now(), coalesce(max(expires_at), now())) into start_at
+  from public.subscriptions where user_id = r.user_id;
+
+  insert into public.subscriptions (user_id, payment_request_id, starts_at, expires_at, validated_by)
+  values (r.user_id, r.id, start_at, start_at + interval '30 days', auth.uid());
+
+  update public.payment_requests
+  set status = 'approved', reviewed_by = auth.uid(), reviewed_at = now()
+  where id = r.id;
+
+  insert into public.admin_logs (admin_id, action, target_type, target_id, details)
+  values (auth.uid(), 'approve_payment', 'payment_request', r.id::text,
+          jsonb_build_object('user_id', r.user_id, 'ref', r.transaction_ref));
+end $$;
+
+create or replace function public.reject_payment(req_id uuid, reason text) returns void
+language plpgsql security definer set search_path = public as $$
+declare r public.payment_requests;
+begin
+  if not public.is_admin() then raise exception 'forbidden' using errcode = '42501'; end if;
+  select * into r from public.payment_requests where id = req_id for update;
+  if not found then raise exception 'not_found'; end if;
+  if r.status <> 'pending' then raise exception 'already_processed'; end if;
+
+  update public.payment_requests
+  set status = 'rejected', reject_reason = left(reason, 300),
+      reviewed_by = auth.uid(), reviewed_at = now()
+  where id = r.id;
+
+  insert into public.admin_logs (admin_id, action, target_type, target_id, details)
+  values (auth.uid(), 'reject_payment', 'payment_request', r.id::text,
+          jsonb_build_object('reason', left(reason, 300)));
+end $$;
+
+-- ───────── Fournisseurs / plateformes ─────────
+create table public.suppliers (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  categories text[] not null default '{}',
+  countries text[] not null default '{}',
+  purchase_conditions text,
+  min_quantity text,
+  delivery_info text,
+  url text check (url ~ '^https://'),
+  last_verified_at date,
+  verification_level text not null default 'unverified'
+    check (verification_level in ('known_platform','verified_seller','unverified')),
+  warnings text,
+  is_premium boolean not null default false,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table public.reports (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  supplier_id uuid references public.suppliers(id) on delete set null,
+  kind text not null check (kind in ('suspicious_link','incorrect_info','other')),
+  message text not null check (char_length(message) between 5 and 1000),
+  status text not null default 'open' check (status in ('open','closed')),
+  created_at timestamptz not null default now()
+);
+
+-- ───────── Espace personnel ─────────
+create table public.favorites (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  supplier_id uuid not null references public.suppliers(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, supplier_id)
+);
+
+create table public.goals (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null check (char_length(title) between 1 and 120),
+  target_fcfa integer check (target_fcfa >= 0),
+  due_date date,
+  done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create table public.search_history (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  query text not null check (char_length(query) <= 120),
+  created_at timestamptz not null default now()
+);
+
+-- ───────── RLS ─────────
+alter table public.profiles enable row level security;
+alter table public.payment_requests enable row level security;
+alter table public.subscriptions enable row level security;
+alter table public.admin_logs enable row level security;
+alter table public.suppliers enable row level security;
+alter table public.reports enable row level security;
+alter table public.favorites enable row level security;
+alter table public.goals enable row level security;
+alter table public.search_history enable row level security;
+
+-- profiles : lecture de son profil ; modification limitée au nom (le rôle est protégé par GRANT de colonne)
+create policy profiles_select on public.profiles for select using (id = auth.uid() or public.is_admin());
+create policy profiles_update on public.profiles for update using (id = auth.uid()) with check (id = auth.uid());
+revoke update on public.profiles from authenticated, anon;
+grant update (display_name) on public.profiles to authenticated;
+
+-- paiements : l'utilisateur crée une demande « pending » ; aucune mise à jour directe (fonctions uniquement)
+create policy pay_select on public.payment_requests for select using (user_id = auth.uid() or public.is_admin());
+create policy pay_insert on public.payment_requests for insert
+  with check (user_id = auth.uid() and status = 'pending' and reviewed_by is null);
+
+-- abonnements et journaux : lecture seule ; écriture uniquement via fonctions security definer
+create policy sub_select on public.subscriptions for select using (user_id = auth.uid() or public.is_admin());
+create policy logs_select on public.admin_logs for select using (public.is_admin());
+
+-- fournisseurs : le contenu Premium est filtré côté serveur
+create policy sup_select on public.suppliers for select using (
+  public.is_admin() or (is_active and (not is_premium or public.has_premium()))
+);
+create policy sup_admin_write on public.suppliers for all using (public.is_admin()) with check (public.is_admin());
+
+-- signalements
+create policy rep_insert on public.reports for insert with check (user_id = auth.uid());
+create policy rep_select on public.reports for select using (user_id = auth.uid() or public.is_admin());
+create policy rep_admin_update on public.reports for update using (public.is_admin()) with check (public.is_admin());
+
+-- données personnelles : propriétaire uniquement
+create policy fav_all on public.favorites for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy goals_all on public.goals for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy hist_all on public.search_history for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Droits d'exécution des fonctions sensibles
+revoke all on function public.approve_payment(uuid) from public, anon;
+revoke all on function public.reject_payment(uuid, text) from public, anon;
+grant execute on function public.approve_payment(uuid) to authenticated;
+grant execute on function public.reject_payment(uuid, text) to authenticated;
+
+-- ───────── Premier administrateur (À FAIRE MANUELLEMENT) ─────────
+-- 1. Créez d'abord votre compte via l'application (e-mail + mot de passe fort).
+-- 2. Puis exécutez UNE fois dans le SQL Editor :
+--    update public.profiles set role = 'admin'
+--    where id = (select id from auth.users where email = 'navjboutique225@gmail.com');
+-- Lot 2 : plateformes connues. Aucune condition, aucun prix, aucune date de vérification n'est inventé.
+-- L'admin renseignera conditions et date de vérification après contrôle réel.
+insert into public.suppliers (name, description, categories, countries, url, verification_level, warnings) values
+('Jumia Côte d''Ivoire', 'Place de marché en ligne généraliste.', '{"Électronique et accessoires","Téléphones et informatique","Mode et beauté","Maison et équipements","Vente au détail"}', '{"Côte d''Ivoire"}', 'https://www.jumia.ci', 'known_platform', 'Les vendeurs sont des tiers : vérifiez l''avis, le délai et la politique de retour avant d''acheter.'),
+('Alibaba.com', 'Plateforme internationale orientée achat en gros auprès de fabricants et grossistes.', '{"Achat en gros","Fournitures professionnelles","Électronique et accessoires"}', '{}', 'https://www.alibaba.com', 'known_platform', 'Quantités minimales, transport et douane varient selon le vendeur. Demandez un devis complet et évitez de payer hors plateforme.'),
+('AliExpress', 'Place de marché internationale, souvent utilisée pour acheter à l''unité ou en petites quantités.', '{"Électronique et accessoires","Téléphones et informatique","Mode et beauté","Maison et équipements","Vente au détail"}', '{}', 'https://www.aliexpress.com', 'known_platform', 'Délais, frais de livraison et droits de douane vers la Côte d''Ivoire non vérifiés par NAVJ : consultez la plateforme avant de commander.');
+{
+  "name": "navj-opportunites",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "tsc --noEmit && vite build", "preview": "vite preview", "test": "node --experimental-strip-types --test tests/*.test.ts" },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "typescript": "5.5.4",
+    "vite": "5.4.8"
+  }
+}
+{
+  "name": "navj-opportunites",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "tsc --noEmit && vite build", "preview": "vite preview", "test": "node --experimental-strip-types --test tests/*.test.ts" },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "typescript": "5.5.4",
+    "vite": "5.4.8"
+  }
+}
