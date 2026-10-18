@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#7A1F2B">
+<title>NAVJ OPPORTUNITÉS</title><style>:root{--bd:#7A1F2B;--rose:#E8A0B0;--ink:#2B2B2B;--bg2:#F4F4F5;--line:#E2E2E4}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;color:var(--ink);background:#fff;padding-bottom:64px}
+a{color:var(--bd)}h1{font-size:1.4rem;line-height:1.25}h2{font-size:1.05rem;margin:.2rem 0}
+.top{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-bottom:2px solid var(--rose);position:sticky;top:0;background:#fff;z-index:5}
+.logo{font-weight:800;letter-spacing:.04em;text-decoration:none;color:var(--ink)}.logo span{color:var(--bd)}
+.wrap{max-width:720px;margin:0 auto;padding:1rem}
+.hero{background:var(--bg2);border-left:4px solid var(--bd);border-radius:8px;padding:1rem;margin-bottom:1rem}
+.hero form{display:flex;gap:.5rem;flex-wrap:wrap}.hero input,.search{flex:1;min-width:0}
+input{padding:.7rem;border:1px solid #bbb;border-radius:8px;font-size:1rem;width:100%}input:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--rose);outline-offset:1px}
+.btn{display:inline-block;background:var(--bd);color:#fff;border:0;border-radius:8px;padding:.7rem 1rem;font-size:1rem;text-decoration:none;cursor:pointer}.btn:disabled{opacity:.6}
+.link{background:none;border:0;color:var(--bd);font-size:.95rem;cursor:pointer;text-decoration:underline}
+.grid{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{display:block;border:1px solid var(--line);border-radius:10px;padding:1rem;margin:.75rem 0;color:inherit;text-decoration:none;animation:in .25s ease}
+.grid .card{margin:0}.card.muted{background:var(--bg2)}.form{display:grid;gap:.75rem}.form label{display:grid;gap:.25rem;font-size:.9rem}
+.meta{font-size:.9rem;color:#555;margin:.25rem 0}.warn{font-size:.9rem;background:#fdf0f3;padding:.5rem;border-radius:6px}
+.badge{font-size:.7rem;padding:.15rem .5rem;border-radius:99px;border:1px solid var(--bd);color:var(--bd);vertical-align:middle}.badge.unverified{border-color:#777;color:#555}
+.notice{background:var(--bg2);padding:.75rem;border-radius:8px}
+.foot{text-align:center;font-size:.85rem;padding:1rem}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid var(--line)}
+.tabs a{flex:1;text-align:center;padding:.9rem 0;text-decoration:none;color:var(--ink);font-size:.9rem}.tabs a.active{color:var(--bd);font-weight:700;border-top:3px solid var(--bd)}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.chips{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.4rem}.chip{white-space:nowrap;border:1px solid var(--bd);background:#fff;color:var(--bd);border-radius:99px;padding:.45rem .8rem;font-size:.9rem}.chip.on{background:var(--bd);color:#fff}
+.row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}select{padding:.7rem;border:1px solid #bbb;border-radius:8px;font-size:1rem}
+.tabs a{font-size:.78rem}
+.tpl{white-space:pre-wrap;background:var(--bg2);padding:.75rem;border-radius:8px;font:inherit;font-size:.9rem}
+details summary{cursor:pointer}ol,ul{padding-left:1.2rem}
+body{font-size:16px;background:#faf7f8;-webkit-tap-highlight-color:transparent}
+h1{font-size:1.5rem;font-weight:800}h2{font-size:1.1rem;font-weight:700}
+.top{box-shadow:0 1px 6px rgba(0,0,0,.08);gap:.5rem;justify-content:flex-start}.top .link{margin-left:auto}
+#back{border:0;background:var(--bg2);border-radius:50%;width:40px;height:40px;font-size:1.3rem;color:var(--bd);cursor:pointer}#back[hidden]{display:none}
+.btn{min-height:48px;font-weight:600;border-radius:12px;box-shadow:0 2px 6px rgba(122,31,43,.25);display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.btn.ghost{background:#fff;color:var(--bd);border:2px solid var(--bd);box-shadow:none}.btn:disabled{opacity:.35;box-shadow:none}
+.btn.sm{min-height:40px;font-size:.9rem;padding:.4rem .9rem}.form .btn{width:100%}
+.card{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.nav2{display:flex;gap:.75rem;margin:1rem 0}.nav2 .btn{flex:1}
+.prog{display:flex;gap:6px;margin:.5rem 0}.prog i{flex:1;height:5px;border-radius:3px;background:var(--line)}.prog i.on{background:var(--bd)}
+.page{animation:slide .25s ease}@keyframes slide{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.searchbar{display:flex;gap:.5rem;margin-bottom:.5rem}.searchbar input{flex:1}
+.cats{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem}.cats .chip{text-decoration:none;white-space:nowrap}
+.pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
+.prod{border:1px solid var(--line);border-radius:12px;padding:.6rem;display:flex;flex-direction:column;gap:.35rem;background:#fff}
+.prod img,.ph{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.price{color:var(--bd);font-weight:800}
+.ban{background:var(--bd);color:#fff;border-radius:14px;padding:1rem;margin:.75rem 0}.ban p{margin:.3rem 0 .6rem}.ban .btn{background:#fff;color:var(--bd);box-shadow:none}
+.tabs{box-shadow:0 -2px 8px rgba(0,0,0,.08);background:#fff}.tabs a{font-size:.72rem;padding:.5rem 0}.tabs a span{display:block;font-size:1.25rem}
+.tbl{width:100%;border-collapse:collapse}.tbl th,.tbl td{padding:.5rem;border-bottom:1px solid var(--line);text-align:left;font-size:.9rem}
+</style></head>
+<body><header class="top"><button id="back" aria-label="Retour" hidden>←</button><a href="#/" class="logo" aria-label="NAVJ OPPORTUNITÉS">NAVJ <span>OPPORTUNITÉS</span></a><a class="link" href="#/premium">Premium</a></header>
+<main class="wrap" id="app"></main>
+<footer class="foot"><p><a href="#/premium">Premium</a> · <a href="#/aide">Aide</a> · <a href="#/legal/cgu">CGU</a> · <a href="#/legal/confidentialite">Confidentialité</a></p>
+<p><a href="mailto:navjboutique225@gmail.com">navjboutique225@gmail.com</a> · <a href="https://wa.me/2250564939858" target="_blank" rel="noopener noreferrer">WhatsApp +225 05 64 93 98 58</a></p></footer>
+<nav class="tabs" aria-label="Navigation principale"><a href="#/" data-p="accueil"><span>🏠</span>Accueil</a><a href="#/boutique" data-p="boutique"><span>🛒</span>Boutique</a><a href="#/fournisseurs" data-p="fournisseurs"><span>🏭</span>Fournisseurs</a><a href="#/calculs" data-p="calculs"><span>🧮</span>Calculs</a><a href="#/premium" data-p="premium"><span>⭐</span>Premium</a></nav>
+<script>
+// Calculs commerciaux NAVJ. Fonctions pures, testées dans tests/calc.test.ts.
+// Toutes les sommes sont en FCFA. Un résultat est soit { ok: true, value }, soit { ok: false, error }.
+                                                                              
+const fail = (error        )                => ({ ok: false, error });
+const good =     (value   )            => ({ ok: true, value });
+
+const bad = (n         )          => typeof n !== 'number' || !Number.isFinite(n);
+const neg = (n        )          => n < 0;
+
+/** Marge brute = (prix de vente − coût) / prix de vente. Taux de marque = (prix − coût) / coût. */
+function margin(sellingPrice        , cost        )                                                                          {
+  if (bad(sellingPrice) || bad(cost)) return fail('Valeur manquante ou invalide.');
+  if (neg(sellingPrice) || neg(cost)) return fail('Les valeurs ne peuvent pas être négatives.');
+  if (sellingPrice === 0) return fail('Le prix de vente doit être supérieur à 0.');
+  const amount = sellingPrice - cost;
+  return good({ amount, marginPct: (amount / sellingPrice) * 100, markupPct: cost === 0 ? null : (amount / cost) * 100 });
+}
+
+                              
+                                                              
+                                                                                     
+                                                       
+ 
+/** Bénéfice estimé = CA − (achats + transport + taxes + emballage + autres + commission). */
+function estimatedProfit(i             )                                                                                     {
+  const { transport = 0, taxesAndFees = 0, packaging = 0, otherCosts = 0, commissionPct = 0 } = i;
+  const all = [i.unitPurchase, i.quantity, i.unitSelling, transport, taxesAndFees, packaging, otherCosts, commissionPct];
+  if (all.some(bad)) return fail('Valeur manquante ou invalide.');
+  if (all.some(neg)) return fail('Les valeurs ne peuvent pas être négatives.');
+  if (i.quantity === 0) return fail('La quantité doit être supérieure à 0.');
+  if (commissionPct > 100) return fail('La commission ne peut pas dépasser 100 %.');
+  const revenue = i.unitSelling * i.quantity;
+  const totalCosts = i.unitPurchase * i.quantity + transport + taxesAndFees + packaging + otherCosts + revenue * (commissionPct / 100);
+  const profit = revenue - totalCosts;
+  return good({ revenue, totalCosts, profit, profitPct: revenue === 0 ? 0 : (profit / revenue) * 100 });
+}
+
+/** Prix de vente pour une marge cible (sur prix de vente) : prix = coût / (1 − marge). */
+function sellingPriceForMargin(unitCost        , targetMarginPct        )                 {
+  if (bad(unitCost) || bad(targetMarginPct)) return fail('Valeur manquante ou invalide.');
+  if (neg(unitCost) || neg(targetMarginPct)) return fail('Les valeurs ne peuvent pas être négatives.');
+  if (targetMarginPct >= 100) return fail('Une marge de 100 % ou plus est impossible.');
+  return good(unitCost / (1 - targetMarginPct / 100));
+}
+
+/** Seuil de rentabilité (unités) = charges fixes / (prix unitaire − coût variable unitaire). */
+function breakEven(fixedCosts        , unitPrice        , unitVariableCost        )                            {
+  if ([fixedCosts, unitPrice, unitVariableCost].some(bad)) return fail('Valeur manquante ou invalide.');
+  if ([fixedCosts, unitPrice, unitVariableCost].some(neg)) return fail('Les valeurs ne peuvent pas être négatives.');
+  const contribution = unitPrice - unitVariableCost;
+  if (contribution <= 0) return fail('Le prix doit dépasser le coût variable : le seuil est inatteignable.');
+  return good({ units: Math.ceil(fixedCosts / contribution) });
+}
+
+/** Coût de livraison = forfait + tarif au kg × poids. Les tarifs sont saisis par l'utilisateur. */
+function deliveryCost(base        , perKg        , weightKg        )                 {
+  if ([base, perKg, weightKg].some(bad)) return fail('Valeur manquante ou invalide.');
+  if ([base, perKg, weightKg].some(neg)) return fail('Les valeurs ne peuvent pas être négatives.');
+  return good(base + perKg * weightKg);
+}
+
+/** Budget de démarrage = somme des postes saisis. */
+function startupBudget(items          )                 {
+  if (items.some(bad)) return fail('Valeur manquante ou invalide.');
+  if (items.some(neg)) return fail('Les valeurs ne peuvent pas être négatives.');
+  return good(items.reduce((a, b) => a + b, 0));
+}
+
+                                                                                                                            
+/** Comparateur : coût complet par unité = (prix × quantité + transport + taxes) / quantité. Trié du moins cher au plus cher. */
+function compareSuppliers(offers                 )                                                                     {
+  if (offers.length === 0) return fail('Ajoutez au moins une offre.');
+  const rows                                                             = [];
+  for (const o of offers) {
+    const n = [o.unitPrice, o.quantity, o.shipping, o.taxesAndFees];
+    if (n.some(bad)) return fail(`Offre « ${o.name} » : valeur invalide.`);
+    if (n.some(neg)) return fail(`Offre « ${o.name} » : valeur négative.`);
+    if (o.quantity === 0) return fail(`Offre « ${o.name} » : quantité nulle.`);
+    const totalCost = o.unitPrice * o.quantity + o.shipping + o.taxesAndFees;
+    rows.push({ name: o.name, totalCost, costPerUnit: totalCost / o.quantity });
+  }
+  return good(rows.sort((a, b) => a.costPerUnit - b.costPerUnit));
+}
+
+                                     
+
+                                                                             
+                                                                                                                      
+                       
+                                                                                                          
+                                                                                                                                             
+ 
+
+const INTERESTS                                                                                             = {
+  phone: { label: 'Téléphones et accessoires', query: 'Téléphones',
+    ideas: ['Vente de coques, câbles et chargeurs', 'Petit stand de dépannage et accessoires'],
+    materials: ['Présentoir ou table', 'Téléphone avec photos nettes', 'Sachets ou emballages'] },
+  fashion: { label: 'Mode et beauté', query: 'Mode',
+    ideas: ['Revente de vêtements ou accessoires en petites séries', 'Produits de beauté en vente au détail'],
+    materials: ['Cintres ou présentoir', 'Miroir', 'Emballages propres'] },
+  home: { label: 'Maison et équipements', query: 'Maison',
+    ideas: ['Petits équipements de cuisine et de maison', 'Revente de fournitures pour la maison'],
+    materials: ['Espace de stockage sec', 'Emballage de protection', 'Moyen de transport'] },
+  daily: { label: 'Produits du quotidien', query: 'quotidien',
+    ideas: ['Vente de produits de consommation courante en petites quantités', 'Livraison de proximité de produits du quotidien'],
+    materials: ['Stockage adapté aux produits', 'Balance si vente au poids', 'Cahier de caisse'] },
+  services: { label: 'Services professionnels', query: 'Services',
+    ideas: ['Service de livraison locale', "Impression, saisie ou aide administrative"],
+    materials: ['Téléphone et connexion', 'Outils propres au service', 'Carnet de rendez-vous'] },
+};
+
+function buildPlan(i            )               {
+  if (typeof i.budget !== 'number' || !Number.isFinite(i.budget) || i.budget <= 0) return { ok: false, error: 'Indiquez un budget supérieur à 0.' };
+  if (!Number.isFinite(i.hoursPerWeek) || i.hoursPerWeek < 1 || i.hoursPerWeek > 100) return { ok: false, error: 'Le temps disponible doit être entre 1 et 100 heures par semaine.' };
+  const it = INTERESTS[i.interest];
+  if (!it) return { ok: false, error: "Centre d'intérêt inconnu." };
+  const share                     = [['Stock de départ', 0.55], ['Transport / livraison', 0.1], ['Emballage', 0.05], ['Communication (photos, messages)', 0.05]];
+  const spend = share.map(([label, p]) => ({ label, amount: Math.round(i.budget * p) }));
+  spend.push({ label: 'Réserve pour imprévus', amount: i.budget - spend.reduce((a, b) => a + b.amount, 0) });
+  const where = i.city.trim() || 'votre zone';
+  const slow = i.hoursPerWeek < 10;
+  return { ok: true, value: {
+    ideas: it.ideas, spend, materials: it.materials, supplierQuery: it.query,
+    fees: ['Transport du fournisseur jusqu\'à chez vous', 'Taxes ou frais de douane si achat à l\'étranger', 'Commissions de plateforme ou de paiement', 'Emballage et pertes éventuelles'],
+    demandTest: [`Montrez 2 ou 3 produits à 10 personnes de ${where} avant tout gros achat.`, 'Prenez des précommandes ou des acomptes quand c\'est possible.', 'Achetez une petite quantité test, puis mesurez ce qui se vend en 7 jours.'],
+    firstCustomers: ['Proposez à votre entourage proche et aux voisins', 'Publiez photos et prix sur WhatsApp (statut, groupes autorisés)', 'Offrez un petit avantage au premier client qui vous recommande'],
+    calendar: ['Semaine 1 : choisir le produit, comparer 3 fournisseurs, tester la demande', 'Semaine 2 : commander une petite quantité test, préparer photos et messages', `Semaine 3 : vendre, noter chaque vente et chaque dépense${slow ? ' (rythme plus lent avec moins de 10 h par semaine)' : ''}`, 'Semaine 4 : calculer marge et bénéfice réels, décider de réinvestir ou d\'ajuster'],
+    risks: ['Produit qui ne se vend pas : limitez le stock initial', 'Vendeur peu fiable : vérifiez avant de payer', 'Retards de livraison ou frais imprévus', 'Trésorerie bloquée dans le stock'],
+    kpis: ['Nombre de ventes par semaine', 'Marge réelle par produit', 'Bénéfice après toutes dépenses', 'Taux de clients qui reviennent', objectifKpi(i.goal)],
+    assumptions: ['Aucune donnée de ce plan n\'est vérifiée : ce sont des hypothèses de départ.', 'Les parts du budget (55 % stock, 10 % transport, 5 % emballage, 5 % communication, le reste en réserve) sont des repères à ajuster, pas des prix du marché.', 'Aucun gain n\'est garanti.'],
+  } };
+}
+const objectifKpi = (g        ) => (g.trim() ? `Avancement vers votre objectif : « ${g.trim().slice(0, 100)} »` : 'Avancement vers votre objectif');
+
+                                                                                      
+                                                                     
+
+const GUIDES          = [
+  { id: 'produit', title: 'Choisir un produit à vendre', summary: 'Partir de la demande réelle, pas de l\'envie.',
+    steps: ['Listez 5 produits que vos proches achètent souvent.', 'Notez où ils les achètent aujourd\'hui et à quel prix.', 'Éliminez ceux qui sont fragiles, périssables ou trop chers pour votre budget.', 'Gardez 1 ou 2 produits et testez la demande (voir le guide suivant).'] },
+  { id: 'demande', title: 'Tester la demande avant de gros achats', summary: 'Réduire le risque de stock invendu.',
+    steps: ['Montrez le produit (photo ou échantillon) à au moins 10 clients potentiels.', 'Demandez le prix qu\'ils accepteraient de payer.', 'Prenez des précommandes ou des acomptes si possible.', 'Commandez d\'abord une petite quantité.'] },
+  { id: 'prix', title: 'Fixer son prix de vente', summary: 'Un prix qui couvre tous vos coûts.',
+    steps: ['Additionnez achat, transport, taxes, emballage et commissions, puis divisez par la quantité.', 'Utilisez le calculateur « Prix de vente » avec la marge visée.', 'Comparez avec les prix pratiqués autour de vous.', 'Recalculez après vos premières ventes avec les chiffres réels.'] },
+  { id: 'etranger', title: 'Acheter sur une plateforme étrangère', summary: 'Points à vérifier avant de commander.',
+    steps: ['Lisez les conditions de livraison vers la Côte d\'Ivoire et les délais annoncés.', 'Renseignez-vous sur les droits et taxes auprès des autorités douanières.', 'Commandez d\'abord un seul exemplaire pour juger la qualité.', 'Payez uniquement via le moyen proposé par la plateforme.'] },
+  { id: 'suivi', title: 'Suivre ses ventes et ses dépenses', summary: 'Ce qui n\'est pas noté est perdu.',
+    steps: ['Notez chaque vente et chaque dépense le jour même.', 'Séparez votre argent personnel de celui de l\'activité.', 'Faites un bilan chaque semaine.', 'Comparez la marge réelle à la marge prévue.'] },
+];
+
+const CHECKLIST_ACHAT = [
+  'Le vendeur ou la plateforme est identifiable (nom, site, contact).', 'J\'ai cherché des avis indépendants.', 'Le prix total (transport, taxes, frais) est connu.',
+  'Les délais et la politique de retour sont écrits.', 'Le moyen de paiement offre une protection ou une preuve.', 'Je commence par une petite quantité.', 'J\'ai gardé les échanges et la facture.',
+];
+
+const ANTI_ARNAQUE = [
+  'Méfiez-vous des prix très inférieurs au marché et des offres « limitées » qui pressent.', 'Ne payez jamais en totalité à un inconnu sans moyen de preuve ou de recours.',
+  'Refusez de sortir de la plateforme pour payer ou discuter.', 'Vérifiez l\'adresse du site : une lettre différente peut signaler une copie.',
+  'Ne communiquez jamais votre code secret ou un code reçu par SMS.', 'Un vendeur sérieux accepte de répondre à vos questions et de donner des détails écrits.', 'En cas de doute, signalez la fiche depuis NAVJ OPPORTUNITÉS.',
+];
+
+const TEMPLATES             = [
+  { id: 'fournisseur', title: 'Message à un fournisseur (demande de prix)',
+    text: 'Bonjour,\nJe souhaite acheter [produit] en quantité de [quantité] pour livraison à [ville, pays].\nPouvez-vous m\'indiquer :\n- le prix unitaire et le prix total,\n- les frais et le délai de livraison,\n- la quantité minimale et les conditions de paiement,\n- la politique de retour en cas de défaut ?\nMerci d\'avance.\n[Votre nom]' },
+  { id: 'client', title: 'Message client (confirmation de commande)',
+    text: 'Bonjour [nom],\nMerci pour votre commande : [produit] x [quantité], total [montant] FCFA.\nLivraison ou retrait : [lieu / date].\nPaiement : [mode de paiement].\nN\'hésitez pas à me contacter pour toute question.\n[Votre nom]' },
+  { id: 'suivi', title: 'Suivi de commande (à copier dans vos notes)',
+    text: 'Commande n° [ ]\nFournisseur : [ ]\nProduit / quantité : [ ]\nPrix total payé : [ ] FCFA\nDate de commande : [ ]\nDate de livraison prévue : [ ]\nDate de réception : [ ]\nÉtat : [en attente / expédiée / reçue / problème]\nRemarques : [ ]' },
+  { id: 'devis', title: 'Devis simple',
+    text: 'DEVIS n° [ ]  —  Date : [ ]  —  Valable jusqu\'au : [ ]\nVendeur : [nom, contact]\nClient : [nom, contact]\n\nDésignation | Quantité | Prix unitaire | Total\n[ ] | [ ] | [ ] FCFA | [ ] FCFA\n\nTotal : [ ] FCFA\nConditions : [paiement, délai]' },
+  { id: 'facture', title: 'Facture simple',
+    text: 'FACTURE n° [ ]  —  Date : [ ]\nVendeur : [nom, contact, numéro d\'identification si vous en avez un]\nClient : [nom, contact]\n\nDésignation | Quantité | Prix unitaire | Total\n[ ] | [ ] | [ ] FCFA | [ ] FCFA\n\nTotal à payer : [ ] FCFA\nPayé le : [ ] par [mode]\nNote : modèle simple ; vérifiez les obligations légales applicables à votre activité.' },
+];
+
+const FAQ                             = [
+  { q: 'NAVJ OPPORTUNITÉS vend-il des produits ?', a: 'Non. La plateforme aide à trouver des fournisseurs, comparer et calculer. Les achats se font sur les sites des vendeurs.' },
+  { q: 'Les gains sont-ils garantis ?', a: 'Non. Les outils donnent des estimations à partir de vos chiffres. Aucun bénéfice n\'est garanti.' },
+  { q: 'Combien coûte Premium et combien de temps dure-t-il ?', a: '2 000 FCFA pour 30 jours à partir de la validation de votre paiement. Pas de renouvellement automatique.' },
+  { q: 'Comment mon paiement est-il validé ?', a: 'Vous payez via Wave puis envoyez votre référence de transaction. L\'administrateur vérifie dans son compte Wave, puis approuve ou refuse. Rien n\'est activé sur simple déclaration.' },
+  { q: 'Que signifie « plateforme connue » ?', a: 'La plateforme existe et est largement connue. Cela ne garantit pas la fiabilité de chaque vendeur. « Vendeur vérifié » signifie contrôlé par NAVJ à la date indiquée ; « non vérifié » signifie aucune vérification.' },
+  { q: 'Comment signaler un lien suspect ?', a: 'Depuis la fiche du fournisseur, bouton « Signaler », ou par e-mail ou WhatsApp.' },
+  { q: 'Comment supprimer mon compte ?', a: 'Dans « Compte », bouton « Supprimer mon compte ». Vos données liées sont effacées.' },
+];
+
+const LEGAL                                                          = {
+  cgu: { title: 'Conditions d\'utilisation', paragraphs: [
+    'Modèle à faire relire par un juriste avant tout lancement commercial.',
+    'Objet : NAVJ OPPORTUNITÉS fournit des informations, des outils de calcul et des ressources pour aider à préparer une activité commerciale. Le contenu est indicatif et ne garantit aucun résultat financier.',
+    'Compte : vous êtes responsable de la confidentialité de vos identifiants et de l\'exactitude des informations fournies.',
+    'Premium : 2 000 FCFA pour 30 jours à compter de la validation du paiement par l\'administrateur. Le paiement s\'effectue via Wave ; l\'accès n\'est activé qu\'après vérification. Le renouvellement exige un nouveau paiement validé. Conditions de remboursement : [à définir par le propriétaire].',
+    'Liens externes : les sites tiers sont indépendants de NAVJ OPPORTUNITÉS. Vérifiez toujours les conditions avant d\'acheter. NAVJ n\'est pas partie aux transactions entre vous et les vendeurs.',
+    'Comportements interdits : fausses informations, usurpation, tentative d\'accès non autorisé, usage frauduleux de la plateforme.',
+    'Contact : navjboutique225@gmail.com ou WhatsApp +225 05 64 93 98 58.' ] },
+  confidentialite: { title: 'Politique de confidentialité', paragraphs: [
+    'Modèle à faire relire par un juriste (notamment au regard de la loi ivoirienne sur la protection des données personnelles).',
+    'Données collectées : adresse e-mail, mot de passe (stocké sous forme protégée par le service d\'authentification), références de transaction Wave, quatre derniers chiffres du numéro payeur (facultatif), favoris, objectifs et historique de recherche.',
+    'Finalités : fournir le service, gérer les abonnements, vérifier les paiements, assurer la sécurité et l\'assistance.',
+    'Hébergement : les données sont stockées chez Supabase. Aucune donnée bancaire n\'est collectée par NAVJ.',
+    'Durée : les données sont conservées tant que le compte existe, puis supprimées à la suppression du compte, sauf obligation légale.',
+    'Vos droits : accès, correction et suppression. La suppression se fait depuis « Compte ». Pour toute demande : navjboutique225@gmail.com.' ] },
+};
+
+const f = (n        ) => `${(Math.round(n * 100) / 100).toLocaleString('fr-FR')} FCFA`;
+const p = (n        ) => `${(Math.round(n * 100) / 100).toLocaleString('fr-FR')} %`;
+const wrap =     (r           , fmt                    )                   => (r.ok ? { ok: true, value: fmt(r.value) } : r);
+const offer = (v                        , s        , name        ) => ({ name, unitPrice: v[`${s}p`], quantity: v[`${s}q`], shipping: v[`${s}s`], taxesAndFees: v[`${s}t`] });
+const offerFields = (s        , n        )          => [
+  { key: `${s}p`, label: `${n} : prix unitaire` }, { key: `${s}q`, label: `${n} : quantité` },
+  { key: `${s}s`, label: `${n} : transport`, optional: true }, { key: `${s}t`, label: `${n} : taxes et frais`, optional: true },
+];
+
+const CALCS         = [
+  { id: 'margin', label: 'Marge', formula: 'Marge = (prix de vente − coût) ÷ prix de vente. Taux de marque = (prix − coût) ÷ coût.',
+    limits: 'Ne tient pas compte des frais annexes : utilisez « Bénéfice » pour un résultat après dépenses.',
+    fields: [{ key: 'price', label: 'Prix de vente (FCFA)' }, { key: 'cost', label: "Coût d'achat (FCFA)" }],
+    run: v => wrap(margin(v.price, v.cost), m => [`Gain unitaire : ${f(m.amount)}`, `Marge : ${p(m.marginPct)}`, m.markupPct === null ? 'Taux de marque : non calculable (coût 0)' : `Taux de marque : ${p(m.markupPct)}`]) },
+  { id: 'profit', label: 'Bénéfice', formula: "Bénéfice = chiffre d'affaires − (achats + transport + taxes et frais + emballage + autres + commission).",
+    limits: 'Estimation basée uniquement sur vos saisies. Les taxes et frais réels doivent être vérifiés auprès du transporteur et de la douane.',
+    fields: [{ key: 'unitPurchase', label: "Prix d'achat unitaire" }, { key: 'quantity', label: 'Quantité' }, { key: 'unitSelling', label: 'Prix de vente unitaire' },
+      { key: 'transport', label: 'Transport (total)', optional: true }, { key: 'taxesAndFees', label: 'Taxes et frais (total)', optional: true },
+      { key: 'packaging', label: 'Emballage (total)', optional: true }, { key: 'otherCosts', label: 'Autres dépenses', optional: true }, { key: 'commissionPct', label: 'Commission (% du CA)', optional: true }],
+    run: v => wrap(estimatedProfit({ unitPurchase: v.unitPurchase, quantity: v.quantity, unitSelling: v.unitSelling, transport: v.transport, taxesAndFees: v.taxesAndFees, packaging: v.packaging, otherCosts: v.otherCosts, commissionPct: v.commissionPct }),
+      r => [`Chiffre d'affaires : ${f(r.revenue)}`, `Coûts totaux : ${f(r.totalCosts)}`, `Bénéfice estimé : ${f(r.profit)} (${p(r.profitPct)} du CA)`]) },
+  { id: 'price', label: 'Prix de vente', formula: 'Prix = coût unitaire ÷ (1 − marge cible).', limits: 'Le coût doit inclure transport et frais répartis par unité. Le marché peut refuser ce prix.',
+    fields: [{ key: 'unitCost', label: 'Coût unitaire complet (FCFA)' }, { key: 'target', label: 'Marge cible (%)' }],
+    run: v => wrap(sellingPriceForMargin(v.unitCost, v.target), r => [`Prix de vente conseillé : ${f(r)}`]) },
+  { id: 'breakeven', label: 'Seuil de rentabilité', formula: 'Seuil (unités) = charges fixes ÷ (prix unitaire − coût variable unitaire), arrondi au supérieur.',
+    limits: 'Version simplifiée : suppose un prix et des coûts constants.',
+    fields: [{ key: 'fixed', label: 'Charges fixes (FCFA)' }, { key: 'price', label: 'Prix unitaire' }, { key: 'variable', label: 'Coût variable unitaire' }],
+    run: v => wrap(breakEven(v.fixed, v.price, v.variable), r => [`Il faut vendre au moins ${r.units.toLocaleString('fr-FR')} unité(s) pour couvrir les charges fixes.`]) },
+  { id: 'delivery', label: 'Livraison', formula: 'Coût = forfait + tarif au kg × poids.', limits: 'Les tarifs sont ceux que vous saisissez ; NAVJ ne connaît pas les tarifs des transporteurs.',
+    fields: [{ key: 'base', label: 'Forfait (FCFA)' }, { key: 'perKg', label: 'Tarif par kg (FCFA)' }, { key: 'weight', label: 'Poids (kg)' }],
+    run: v => wrap(deliveryCost(v.base, v.perKg, v.weight), r => [`Coût de livraison : ${f(r)}`]) },
+  { id: 'budget', label: 'Budget de départ', formula: 'Budget = somme des postes saisis.', limits: "N'oubliez pas une réserve pour les imprévus.",
+    fields: ['Matériel', 'Stock initial', 'Transport', 'Emballage', 'Autres'].map((l, i) => ({ key: `b${i}`, label: `${l} (FCFA)`, optional: true })),
+    run: v => { const vals = Object.values(v).filter(n => !Number.isNaN(n)); return wrap(startupBudget(vals), r => [`Budget de démarrage : ${f(r)}`]); } },
+  { id: 'compare', label: 'Comparer 2 offres', formula: 'Coût par unité = (prix × quantité + transport + taxes) ÷ quantité.', limits: 'Ne compare que les prix saisis, pas la fiabilité du vendeur.',
+    fields: [...offerFields('a', 'Offre A'), ...offerFields('b', 'Offre B')],
+    run: v => wrap(compareSuppliers([offer(v, 'a', 'Offre A'), offer(v, 'b', 'Offre B')]), r => r.map((x, i) => `${i === 0 ? '✔ ' : ''}${x.name} : ${f(x.costPerUnit)} par unité (total ${f(x.totalCost)})`)) },
+];
+
+const parse = (s        , optional          )         => {
+  const t = s.replace(/\s/g, '').replace(',', '.');
+  return t === '' ? (optional ? 0 : NaN) : Number(t);
+};
+
+
+/* ===== Interface (JavaScript simple, sans installation) ===== */
+const PAYMENT_OPEN = false; // passer à true uniquement quand l'activation Premium (comptes + vérification) est en ligne
+const EMAIL = 'navjboutique225@gmail.com', WA = 'https://wa.me/2250564939858', WAVE = 'https://pay.wave.com/m/M_ci_BsVtsF_0PH8q/c/ci/?amount=2000';
+const SUPPLIERS = [
+  { name: "Jumia Côte d'Ivoire", desc: 'Place de marché en ligne généraliste.', cats: ['Électronique et accessoires', 'Téléphones et informatique', 'Mode et beauté', 'Maison et équipements', 'Vente au détail'], url: 'https://www.jumia.ci', warn: "Les vendeurs sont des tiers : vérifiez l'avis, le délai et la politique de retour avant d'acheter." },
+  { name: 'Alibaba.com', desc: 'Plateforme internationale orientée achat en gros auprès de fabricants et grossistes.', cats: ['Achat en gros', 'Fournitures professionnelles', 'Électronique et accessoires'], url: 'https://www.alibaba.com', warn: 'Quantités minimales, transport et douane varient selon le vendeur. Demandez un devis complet et évitez de payer hors plateforme.' },
+  { name: 'AliExpress', desc: "Place de marché internationale, souvent utilisée pour acheter à l'unité ou en petites quantités.", cats: ['Électronique et accessoires', 'Téléphones et informatique', 'Mode et beauté', 'Maison et équipements', 'Vente au détail'], url: 'https://www.aliexpress.com', warn: "Délais, frais de livraison et droits de douane vers la Côte d'Ivoire non vérifiés par NAVJ : consultez la plateforme avant de commander." },
+];
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ul = a => '<ul>' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+const chips = (items, cur) => '<div class="chips">' + items.map(([k, l]) => `<button class="chip${k === cur ? ' on' : ''}" data-chip="${k}">${esc(l)}</button>`).join('') + '</div>';
+const onChips = fn => app.querySelectorAll('[data-chip]').forEach(b => b.onclick = () => fn(b.dataset.chip));
+
+function supplierCard(s) {
+  return `<article class="card"><h2>${esc(s.name)} <span class="badge known_platform">Plateforme connue</span></h2><p>${esc(s.desc)}</p>
+  <p class="meta">Catégories : ${esc(s.cats.join(', '))}</p><p class="meta">Conditions non vérifiées par NAVJ</p><p class="warn">⚠ ${esc(s.warn)}</p>
+  <a class="btn" href="${s.url}" target="_blank" rel="noopener noreferrer nofollow">Visiter le site</a>
+  <p><a class="link" href="mailto:${EMAIL}?subject=${encodeURIComponent('Signalement : ' + s.name)}">Signaler un lien ou une information</a></p></article>`;
+}
+function clockHtml() {
+  const Z = [['Abidjan', 'Africa/Abidjan'], ['Paris', 'Europe/Paris'], ['Londres', 'Europe/London'], ['Dubaï', 'Asia/Dubai'], ['Shanghai', 'Asia/Shanghai'], ['New York', 'America/New_York']];
+  const now = new Date();
+  return '<section class="card"><h2>Horloge mondiale</h2>' + Z.map(([n, z]) => `<p class="meta"><b>${n}</b> : ${new Intl.DateTimeFormat('fr-FR', { timeZone: z, weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(now)}</p>`).join('') + '</section>';
+}
+
+const PAGES = {
+  accueil() {
+    app.innerHTML = `<section class="hero"><h1>Découvrez des opportunités commerciales et trouvez vos fournisseurs</h1><p>Comparez, calculez vos marges et préparez votre activité depuis votre téléphone.</p>
+    <form id="sf" role="search"><input id="q" placeholder="Produit, fournisseur, guide…" aria-label="Recherche" maxlength="80"><button class="btn">Rechercher</button></form></section>
+    <section class="grid">
+    <a class="card" href="#/fournisseurs"><h2>Fournisseurs</h2><p>Plateformes d'achat avec niveau de vérification.</p></a>
+    <a class="card" href="#/calculs"><h2>Calculateurs</h2><p>Marge, bénéfice, prix de vente, seuil de rentabilité, comparateur.</p></a>
+    <a class="card" href="#/coach"><h2>Coach commercial</h2><p>Plan de démarrage guidé selon votre budget.</p></a>
+    <a class="card" href="#/guides"><h2>Guides et modèles</h2><p>Messages types, listes de contrôle, conseils anti-arnaque.</p></a>
+    <a class="card" href="#/premium"><h2>Premium</h2><p>2 000 FCFA pour 30 jours.</p></a>
+    <a class="card" href="#/aide"><h2>Aide et FAQ</h2><p>Questions fréquentes et contact.</p></a></section>`;
+    document.getElementById('sf').onsubmit = e => { e.preventDefault(); location.hash = '#/recherche?q=' + encodeURIComponent(document.getElementById('q').value.trim()); };
+  },
+  recherche(_, q) {
+    const t = q.toLowerCase();
+    const sup = SUPPLIERS.filter(s => (s.name + s.desc + s.cats.join(' ')).toLowerCase().includes(t));
+    const gu = GUIDES.filter(g => (g.title + g.summary).toLowerCase().includes(t));
+    const tp = TEMPLATES.filter(x => x.title.toLowerCase().includes(t));
+    const none = !sup.length && !gu.length && !tp.length;
+    app.innerHTML = `<h1>Résultats pour « ${esc(q)} »</h1>${none ? '<p class="notice">Aucun résultat.</p>' : ''}${sup.map(supplierCard).join('')}
+    ${gu.length ? '<h2>Guides</h2>' + gu.map(g => `<a class="card" href="#/guides"><b>${esc(g.title)}</b><p class="meta">${esc(g.summary)}</p></a>`).join('') : ''}
+    ${tp.length ? '<h2>Modèles</h2>' + tp.map(x => `<a class="card" href="#/guides"><b>${esc(x.title)}</b></a>`).join('') : ''}`;
+  },
+  fournisseurs(_, q) {
+    app.innerHTML = `<h1>Fournisseurs et plateformes</h1><input class="search" id="flt" placeholder="Filtrer…" aria-label="Filtrer" maxlength="80" value="${esc(q)}"><div id="lst"></div>`;
+    const draw = () => { const t = document.getElementById('flt').value.toLowerCase(); const r = SUPPLIERS.filter(s => (s.name + s.desc + s.cats.join(' ')).toLowerCase().includes(t)); document.getElementById('lst').innerHTML = r.length ? r.map(supplierCard).join('') : '<p class="notice">Aucun résultat.</p>'; };
+    document.getElementById('flt').oninput = draw; draw();
+  },
+  calculs() {
+    let cur = CALCS[0].id;
+    const draw = () => {
+      const c = CALCS.find(x => x.id === cur);
+      app.innerHTML = `<h1>Calculateurs</h1>${chips(CALCS.map(x => [x.id, x.label]), cur)}<div class="card form">
+      ${c.fields.map(fl => `<label>${esc(fl.label)}${fl.optional ? ' (facultatif)' : ''}<input inputmode="decimal" data-k="${fl.key}"></label>`).join('')}
+      <button class="btn" id="go">Calculer</button><div id="out"></div>
+      <p class="meta"><b>Formule :</b> ${esc(c.formula)}</p><p class="meta"><b>Limites :</b> ${esc(c.limits)}</p></div>${clockHtml()}
+      <p class="meta">Convertisseur de devises : non disponible (il faut un service de taux de change daté, non configuré ; aucun taux n'est inventé).</p>`;
+      onChips(k => { cur = k; draw(); });
+      document.getElementById('go').onclick = () => {
+        const raw = {}, vals = {};
+        c.fields.forEach(fl => { raw[fl.key] = app.querySelector(`[data-k="${fl.key}"]`).value; vals[fl.key] = parse(raw[fl.key], fl.optional); });
+        let r;
+        if (c.id === 'budget') {
+          if (c.fields.every(fl => raw[fl.key].trim() === '')) r = { ok: false, error: 'Saisissez au moins un poste.' };
+          else { c.fields.forEach(fl => { if (raw[fl.key].trim() === '') vals[fl.key] = NaN; }); r = c.run(vals); }
+        } else r = c.run(vals);
+        document.getElementById('out').innerHTML = r.ok ? '<div class="notice" role="status">' + r.value.map(l => '<p>' + esc(l) + '</p>').join('') + '</div>' : `<p class="notice" role="alert">${esc(r.error)}</p>`;
+      };
+    };
+    draw();
+  },
+  coach() {
+    app.innerHTML = `<h1>Coach commercial</h1><p class="notice">Plans guidés à partir de modèles prédéfinis. Ce n'est pas une intelligence artificielle connectée et aucune donnée de marché n'est vérifiée.</p>
+    <form class="card form" id="cf"><label>Budget disponible (FCFA)<input id="c_b" inputmode="numeric" required></label>
+    <label>Ville ou zone<input id="c_c" maxlength="60"></label><label>Temps par semaine (heures)<input id="c_h" inputmode="numeric" value="10" required></label>
+    <label>Centre d'intérêt<select id="c_i">${Object.entries(INTERESTS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}</select></label>
+    <label>Votre objectif (facultatif)<input id="c_g" maxlength="100"></label><button class="btn">Générer mon plan</button><div id="co"></div></form><div id="plan"></div>`;
+    document.getElementById('cf').onsubmit = e => {
+      e.preventDefault();
+      const v = id => document.getElementById(id).value;
+      const r = buildPlan({ budget: Number(v('c_b').replace(/\s/g, '').replace(',', '.')), city: v('c_c'), hoursPerWeek: Number(v('c_h')), interest: v('c_i'), goal: v('c_g') });
+      document.getElementById('co').innerHTML = r.ok ? '' : `<p class="notice" role="alert">${esc(r.error)}</p>`;
+      if (!r.ok) { document.getElementById('plan').innerHTML = ''; return; }
+      const p = r.value, S = (t, a) => `<h2>${t}</h2>${ul(a)}`;
+      document.getElementById('plan').innerHTML = `<section class="card">${S('1. Idées adaptées', p.ideas)}<h2>2. Dépenses initiales (hypothèse de répartition)</h2>${ul(p.spend.map(s => s.label + ' : ' + s.amount.toLocaleString('fr-FR') + ' FCFA'))}
+      ${S('3. Matériel éventuel', p.materials)}<h2>4. Pistes de fournisseurs</h2><p><a href="#/fournisseurs?q=${encodeURIComponent(p.supplierQuery)}">Voir les plateformes liées à ce thème</a></p>
+      ${S('5. Frais à anticiper', p.fees)}${S('6. Tester la demande', p.demandTest)}${S('7. Premiers clients', p.firstCustomers)}${S('8. Calendrier de démarrage', p.calendar)}${S('9. Risques', p.risks)}${S('10. Indicateurs de suivi', p.kpis)}
+      <h2>Ce qui est vérifié et ce qui ne l'est pas</h2><div class="warn">${ul(p.assumptions)}</div></section>`;
+    };
+  },
+  guides() {
+    let tab = 'guides';
+    const draw = () => {
+      app.innerHTML = `<h1>Guides et modèles</h1>${chips([['guides', 'Guides'], ['modeles', 'Modèles'], ['listes', 'Listes et sécurité']], tab)}` + (tab === 'guides'
+        ? GUIDES.map(g => `<article class="card"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.summary)}</p><ol>${g.steps.map(s => '<li>' + esc(s) + '</li>').join('')}</ol></article>`).join('')
+        : tab === 'modeles'
+          ? TEMPLATES.map((t, i) => `<article class="card"><h2>${esc(t.title)}</h2><pre class="tpl">${esc(t.text)}</pre><button class="btn" data-cp="${i}">Copier</button></article>`).join('')
+          : `<article class="card"><h2>Liste de contrôle avant achat</h2>${ul(CHECKLIST_ACHAT)}</article><article class="card"><h2>Éviter les escroqueries</h2>${ul(ANTI_ARNAQUE)}</article>`);
+      onChips(k => { tab = k; draw(); });
+      app.querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(TEMPLATES[b.dataset.cp].text); b.textContent = 'Copié ✔'; } catch { b.textContent = 'Copie impossible : sélectionnez le texte'; } });
+    };
+    draw();
+  },
+  premium() {
+    app.innerHTML = `<h1>Premium : 2 000 FCFA pour 30 jours</h1><div class="card"><p>L'accès Premium dure 30 jours à partir de la validation de votre paiement par l'administrateur. Pas de renouvellement automatique. Aucun gain n'est garanti.</p></div>
+    ${PAYMENT_OPEN ? `<div class="card form"><h2>1. Payer avec Wave</h2><a class="btn" href="${WAVE}" target="_blank" rel="noopener noreferrer">Payer 2 000 FCFA avec Wave</a>
+    <h2>2. Envoyer votre référence</h2><label>Référence de transaction Wave<input id="ref" minlength="4" maxlength="64"></label><button class="btn" id="sendref">Envoyer par WhatsApp</button><p id="rm" class="meta"></p>
+    <p class="meta">L'accès n'est jamais activé sur simple déclaration : l'administrateur vérifie le paiement dans son compte Wave.</p></div>`
+    : `<p class="notice">Le paiement Premium n'est pas encore ouvert. Cette version est entièrement gratuite : elle ne contient pas de comptes utilisateurs ni de vérification des paiements, donc rien ne peut être activé en toute sécurité. Contactez-nous pour être prévenu de l'ouverture.</p>
+    <div class="row"><a class="btn" href="mailto:${EMAIL}">E-mail</a><a class="btn" href="${WA}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>`}`;
+    const b = document.getElementById('sendref');
+    if (b) b.onclick = () => { const r = document.getElementById('ref').value.trim(); if (r.length < 4) { document.getElementById('rm').textContent = 'Référence trop courte.'; return; } window.open(WA + '?text=' + encodeURIComponent('Bonjour, paiement Premium NAVJ OPPORTUNITÉS (2 000 FCFA). Référence Wave : ' + r), '_blank', 'noopener'); };
+  },
+  aide() {
+    app.innerHTML = `<h1>Aide et assistance</h1><div class="card"><p>Écrivez-nous : réponse dans la mesure du possible, sans horaire garanti.</p><div class="row"><a class="btn" href="mailto:${EMAIL}">E-mail</a><a class="btn" href="${WA}" target="_blank" rel="noopener noreferrer">WhatsApp +225 05 64 93 98 58</a></div>
+    <p class="meta">Signaler un lien suspect : bouton « Signaler » sur la fiche du fournisseur, ou message par e-mail.</p></div><h2>Questions fréquentes</h2>${FAQ.map(x => `<details class="card"><summary><b>${esc(x.q)}</b></summary><p>${esc(x.a)}</p></details>`).join('')}`;
+  },
+  legal(arg) {
+    const d = LEGAL[arg];
+    app.innerHTML = d ? `<h1>${esc(d.title)}</h1>${d.paragraphs.map(p => '<p>' + esc(p) + '</p>').join('')}` : '<p class="notice">Document introuvable.</p>';
+  },
+};
+function route() {
+  const [path, qs] = location.hash.replace(/^#\/?/, '').split('?');
+  const [page, arg] = path.split('/');
+  const name = page || 'accueil';
+  (PAGES[name] || (() => { app.innerHTML = '<p class="notice">Page introuvable.</p>'; }))(arg, new URLSearchParams(qs || '').get('q') || '');
+  document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('active', a.dataset.p === name));
+  window.scrollTo(0, 0);
+}
+
+/* ===== Premium (codes signés), boutique, navigation type application ===== */
+const DAYS = 30, KEY = 'navj_premium', PUB = {"key_ops":["verify"],"ext":true,"kty":"EC","x":"WSwRFHt_whhC9Q5sN0Vm9wrRM9kyp7S_m-G9Lyw6pOE","y":"smHwqqJZOgAohDVTDp93tsuHeTu_HPkyY3nDA7iWsT0","crv":"P-256"};
+const b64d = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch { /* stockage indisponible */ } } };
+const premiumExp = () => { const s = store.get(); return s && s.exp > Date.now() ? s.exp : null; };
+async function redeem(code) {
+  const m = /^NAVJ1\.([\w-]+)\.([\w-]+)$/.exec(String(code).trim());
+  if (!m) return 'Code invalide.';
+  try {
+    const payload = b64d(m[1]), sig = b64d(m[2]);
+    const key = await crypto.subtle.importKey('jwk', PUB, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    if (!(await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, sig, payload))) return 'Code invalide.';
+    const p = JSON.parse(new TextDecoder().decode(payload));
+    if (Date.now() - p.t > 7 * 864e5) return 'Code expiré (valable 7 jours après son envoi). Contactez-nous.';
+    const s = store.get(), used = (s && s.used) || [];
+    if (used.includes(p.r)) return 'Ce code a déjà été utilisé sur cet appareil.';
+    store.set({ exp: (premiumExp() || Date.now()) + DAYS * 864e5, used: [...used, p.r] });
+    return null;
+  } catch { return 'Code invalide ou navigateur non compatible.'; }
+}
+/* ---PAGES--- */
+const fdate = t => new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const CATS = ['Électronique et accessoires', 'Téléphones et informatique', 'Mode et beauté', 'Maison et équipements', 'Produits du quotidien', 'Fournitures professionnelles', 'Services professionnels'];
+/* Produits en vente : à remplir uniquement avec de vrais produits.
+   Exemple : { name: 'Nom', price: 5000, seller: 'Boutique X', city: 'Abidjan', whatsapp: '2250100000000', category: 'Mode et beauté', image: 'https://…' } */
+const PRODUCTS = [];
+/* Abonnement vendeur : à renseigner par le propriétaire (laisser null tant que non décidé). */
+const SELLER_PRICE_FCFA = null, SELLER_MAX_PRODUCTS = null;
+/* Une fiche produit peut porter until: '2026-12-31' ; elle disparaît automatiquement après cette date. */
+const live = () => PRODUCTS.filter(p => !p.until || new Date(p.until + 'T23:59:59') >= new Date());
+const PGUIDES = [
+  { title: 'Négocier avec un fournisseur', summary: 'Obtenir de meilleures conditions sans perdre la relation.', steps: ['Comparez au moins 3 offres avant de discuter.', 'Demandez le prix pour plusieurs quantités (par exemple 10, 50, 100).', 'Négociez le total (prix, transport, délais), pas seulement le prix unitaire.', 'Proposez une petite première commande, puis une plus grande si la qualité suit.', 'Faites confirmer par écrit prix, délais et conditions de retour.'] },
+  { title: 'Acheter en petites quantités sans mauvaise surprise', summary: 'Limiter les risques de vos premières commandes.', steps: ['Commandez 1 unité ou un échantillon avant la série.', 'Calculez le coût complet par unité avec le comparateur d\'offres.', 'Gardez une marge pour les frais imprévus.', 'Notez la date de commande et la date de réception.', 'Conservez les échanges et les preuves de paiement.'] },
+  { title: 'Gérer la trésorerie d\'un petit commerce', summary: 'Ne pas manquer d\'argent alors que vous vendez.', steps: ['Séparez l\'argent personnel et celui de l\'activité.', 'Gardez une réserve pour 2 à 4 semaines de dépenses courantes.', 'Réinvestissez en priorité dans les produits qui se vendent déjà.', 'Évitez d\'immobiliser tout le budget dans un seul stock.', 'Faites un point chaque semaine : entrées, sorties, solde.'] },
+  { title: 'Fidéliser ses clients', summary: 'Faire revenir ceux qui ont déjà acheté.', steps: ['Notez les coordonnées des clients qui acceptent d\'être recontactés.', 'Remerciez après chaque achat et demandez un retour.', 'Prévenez-les des nouveaux arrivages par message.', 'Offrez un petit avantage pour la recommandation d\'un proche.', 'Répondez vite et honnêtement en cas de problème.'] },
+];
+const PTEMPLATES = [
+  { title: 'Négociation de prix', text: 'Bonjour [nom],\nJ\'ai comparé plusieurs offres pour [produit]. Pour une commande de [quantité], j\'ai besoin d\'un prix total (transport inclus) proche de [montant] FCFA.\nPouvez-vous améliorer votre offre ? Si les conditions conviennent, je commande rapidement.\nMerci.\n[Votre nom]' },
+  { title: 'Relance d\'un paiement en retard', text: 'Bonjour [nom],\nJe me permets de vous rappeler le paiement de [montant] FCFA pour [produit/service], prévu le [date].\nPouvez-vous me confirmer quand il sera effectué ?\nMerci de votre compréhension.\n[Votre nom]' },
+  { title: 'Annonce de promotion', text: 'Promotion sur [produit] : [prix] FCFA au lieu de [ancien prix] FCFA jusqu\'au [date], dans la limite des stocks.\nCommande et livraison : [contact / zone].\n[Nom de la boutique]' },
+];
+
+function wizard(steps, i = 0, ctx = {}) {
+  const s = steps[i], last = i === steps.length - 1;
+  app.innerHTML = `<div class="prog">${steps.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div><p class="meta">Étape ${i + 1} sur ${steps.length}</p><h1>${esc(s.title)}</h1>
+  <div class="card form">${s.html(ctx)}<p class="notice" id="err" role="alert" hidden></p></div>
+  <div class="nav2"><button class="btn ghost" id="prev" ${i ? '' : 'disabled'}>← Précédent</button><button class="btn" id="next">${last ? esc(s.last || 'Terminer') : 'Suivant →'}</button></div>`;
+  if (s.bind) s.bind(ctx);
+  document.getElementById('prev').onclick = () => wizard(steps, i - 1, ctx);
+  document.getElementById('next').onclick = async () => {
+    const err = s.next ? await s.next(ctx) : null;
+    if (err) { const e = document.getElementById('err'); e.textContent = err; e.hidden = false; return; }
+    if (!last) wizard(steps, i + 1, ctx); else if (s.done) s.done(ctx);
+  };
+}
+const val = id => document.getElementById(id).value.trim();
+const input = (id, label, extra = '') => `<label>${label}<input id="${id}" ${extra}></label>`;
+
+PAGES.accueil = () => {
+  const exp = premiumExp();
+  app.innerHTML = `<form id="sf" class="searchbar" role="search"><input id="q" placeholder="Rechercher un produit, un fournisseur, un guide…" maxlength="80" aria-label="Recherche"><button class="btn sm" aria-label="Rechercher">🔍</button></form>
+  <div class="ban"><b>Vendez ici</b><p>Présentez vos produits aux acheteurs de Côte d'Ivoire.</p><a class="btn sm" href="#/vendre">Devenir vendeur</a></div>
+  <h2>Catégories</h2><div class="cats">${CATS.map(c => `<a class="chip" href="#/boutique?q=${encodeURIComponent(c)}">${esc(c)}</a>`).join('')}</div>
+  <h2>Services</h2><section class="grid">
+  <a class="card" href="#/boutique"><h2>🛒 Boutique</h2><p>Produits des vendeurs.</p></a><a class="card" href="#/fournisseurs"><h2>🏭 Fournisseurs</h2><p>Plateformes d'achat vérifiées par niveau.</p></a>
+  <a class="card" href="#/calculs"><h2>🧮 Calculateurs</h2><p>Marge, bénéfice, prix, seuil.</p></a><a class="card" href="#/coach"><h2>🧭 Coach</h2><p>Plan de démarrage guidé.</p></a>
+  <a class="card" href="#/guides"><h2>📘 Guides</h2><p>Modèles et conseils anti-arnaque.</p></a><a class="card" href="#/aide"><h2>💬 Aide</h2><p>FAQ et contact.</p></a></section>
+  <div class="ban"><b>⭐ Premium : 2 000 FCFA / 30 jours</b><p>${exp ? 'Actif jusqu\'au ' + fdate(exp) + '.' : 'Guides, modèles et simulateur de prix en plus.'}</p><a class="btn sm" href="#/${exp ? 'pplus' : 'premium'}">${exp ? 'Ouvrir mon Premium' : 'Découvrir Premium'}</a></div>`;
+  document.getElementById('sf').onsubmit = e => { e.preventDefault(); location.hash = '#/recherche?q=' + encodeURIComponent(val('q')); };
+};
+
+PAGES.boutique = (_, q) => {
+  app.innerHTML = `<h1>Boutique</h1><input class="search" id="bq" placeholder="Rechercher un produit…" maxlength="80" value="${esc(q)}"><div id="bl"></div>
+  <p class="meta">NAVJ OPPORTUNITÉS met en relation acheteurs et vendeurs. Le paiement et la livraison se règlent entre vous : vérifiez le vendeur avant de payer.</p>`;
+  const draw = () => {
+    const t = val('bq').toLowerCase();
+    const r = live().filter(p => (p.name + ' ' + (p.category || '') + ' ' + (p.seller || '')).toLowerCase().includes(t));
+    document.getElementById('bl').innerHTML = r.length ? '<div class="pgrid">' + r.map(p => {
+      const wa = String(p.whatsapp || '2250564939858').replace(/\D/g, '');
+      return `<div class="prod">${/^https:/.test(p.image || '') ? `<img src="${esc(p.image)}" alt="" loading="lazy">` : '<div class="ph">🛍</div>'}<b>${esc(p.name)}</b><span class="price">${Number(p.price).toLocaleString('fr-FR')} FCFA</span><small>${esc(p.seller)} · ${esc(p.city)}</small>
+      <a class="btn sm" href="https://wa.me/${wa}?text=${encodeURIComponent('Bonjour, je suis intéressé par : ' + p.name)}" target="_blank" rel="noopener noreferrer">Commander sur WhatsApp</a></div>`;
+    }).join('') + '</div>' : `<div class="notice"><b>${live().length ? 'Aucun résultat.' : 'Aucun produit en vente pour le moment.'}</b><p>Soyez parmi les premiers vendeurs de la plateforme.</p><a class="btn" href="#/vendre">Vendre ici</a></div>`;
+  };
+  document.getElementById('bq').oninput = draw; draw();
+};
+
+PAGES.vendre = () => wizard([
+  { title: 'Abonnement vendeur', html: () => `<p><b>${SELLER_PRICE_FCFA ? SELLER_PRICE_FCFA.toLocaleString('fr-FR') + ' FCFA pour 30 jours' : 'Tarif communiqué par NAVJ avant tout paiement'}</b></p>${ul(['Vos produits sont publiés pendant 30 jours après vérification par NAVJ.', SELLER_MAX_PRODUCTS ? 'Jusqu\'à ' + SELLER_MAX_PRODUCTS + ' produits.' : 'Le nombre de produits inclus vous est précisé avant paiement.', 'À la fin de la période, vos fiches sont retirées sauf renouvellement.', 'Aucune vente ni aucun gain n\'est garanti.'])}<p class="meta">Vous ne payez rien dans l'application : après examen de votre demande, NAVJ vous envoie le lien de paiement Wave sur WhatsApp.</p>` },
+  { title: 'Votre boutique', html: () => `${input('v_n', 'Nom du vendeur ou de la boutique', 'maxlength="60"')}${input('v_c', 'Ville', 'maxlength="40"')}${input('v_w', 'Numéro WhatsApp', 'inputmode="tel" maxlength="20"')}`,
+    next: c => { c.n = val('v_n'); c.c = val('v_c'); c.w = val('v_w'); if (!c.n || !c.c || c.w.replace(/\D/g, '').length < 8) return 'Renseignez le nom, la ville et un numéro valide.'; } },
+  { title: 'Votre produit', html: () => `${input('v_p', 'Nom du produit', 'maxlength="80"')}<label>Catégorie<select id="v_k">${CATS.map(k => `<option>${esc(k)}</option>`).join('')}</select></label>${input('v_pr', 'Prix (FCFA)', 'inputmode="numeric"')}`,
+    next: c => { c.p = val('v_p'); c.k = val('v_k'); c.pr = parse(val('v_pr'), false); if (!c.p || !(c.pr > 0)) return 'Indiquez le produit et un prix supérieur à 0.'; } },
+  { title: 'Envoyer votre demande', last: 'Envoyer sur WhatsApp', html: c => `<p>Récapitulatif :</p>${ul([c.n + ' · ' + c.c, c.p + ' (' + c.k + ')', c.pr.toLocaleString('fr-FR') + ' FCFA'])}<p class="meta">Votre demande est examinée avant publication. Les conditions de vente sont à confirmer avec NAVJ OPPORTUNITÉS. Ne vendez que des produits légaux et réels.</p>`,
+    next: c => { window.open(WA + '?text=' + encodeURIComponent(`Demande d'abonnement vendeur et de mise en vente.\nVendeur : ${c.n}\nVille : ${c.c}\nWhatsApp : ${c.w}\nProduit : ${c.p}\nCatégorie : ${c.k}\nPrix : ${c.pr} FCFA`), '_blank', 'noopener'); } },
+]);
+
+PAGES.coach = () => wizard([
+  { title: 'Votre budget', html: () => input('c_b', 'Budget disponible (FCFA)', 'inputmode="numeric"'), next: c => { c.b = parse(val('c_b'), false); if (!(c.b > 0)) return 'Indiquez un budget supérieur à 0.'; } },
+  { title: 'Zone et temps', html: () => `${input('c_c', 'Ville ou zone', 'maxlength="60"')}${input('c_h', 'Heures disponibles par semaine', 'inputmode="numeric" value="10"')}`, next: c => { c.c = val('c_c'); c.h = parse(val('c_h'), false); if (!(c.h >= 1 && c.h <= 100)) return 'Entre 1 et 100 heures par semaine.'; } },
+  { title: 'Votre domaine', html: () => `<label>Centre d'intérêt<select id="c_i">${Object.entries(INTERESTS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}</select></label>${input('c_g', 'Votre objectif (facultatif)', 'maxlength="100"')}`, next: c => { c.i = val('c_i'); c.g = val('c_g'); } },
+  { title: 'Votre plan', last: 'Recommencer', done: () => PAGES.coach(), html: c => {
+    const r = buildPlan({ budget: c.b, city: c.c, hoursPerWeek: c.h, interest: c.i, goal: c.g });
+    if (!r.ok) return `<p class="notice">${esc(r.error)}</p>`;
+    const p = r.value, S = (t, a) => `<h2>${t}</h2>${ul(a)}`;
+    return `<p class="notice">Plan guidé à partir de modèles prédéfinis, sans IA connectée ; aucune donnée de marché vérifiée.</p>${S('Idées', p.ideas)}<h2>Dépenses initiales (hypothèse)</h2>${ul(p.spend.map(s => s.label + ' : ' + s.amount.toLocaleString('fr-FR') + ' FCFA'))}${S('Matériel', p.materials)}
+    <p><a href="#/fournisseurs?q=${encodeURIComponent(p.supplierQuery)}">Voir les plateformes liées</a></p>${S('Frais à anticiper', p.fees)}${S('Tester la demande', p.demandTest)}${S('Premiers clients', p.firstCustomers)}${S('Calendrier', p.calendar)}${S('Risques', p.risks)}${S('Indicateurs', p.kpis)}<div class="warn">${ul(p.assumptions)}</div>`; } },
+]);
+
+PAGES.guides = () => {
+  let tab = 'guides', gi = 0;
+  const draw = () => {
+    let body;
+    if (tab === 'guides') {
+      const g = GUIDES[gi];
+      body = `<p class="meta">Guide ${gi + 1} sur ${GUIDES.length}</p><article class="card"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.summary)}</p><ol>${g.steps.map(s => '<li>' + esc(s) + '</li>').join('')}</ol></article>
+      <div class="nav2"><button class="btn ghost" id="gp" ${gi ? '' : 'disabled'}>← Précédent</button><button class="btn" id="gn" ${gi < GUIDES.length - 1 ? '' : 'disabled'}>Suivant →</button></div>`;
+    } else if (tab === 'modeles') body = TEMPLATES.map((t, i) => `<article class="card"><h2>${esc(t.title)}</h2><pre class="tpl">${esc(t.text)}</pre><button class="btn" data-cp="${i}">Copier</button></article>`).join('');
+    else body = `<article class="card"><h2>Liste de contrôle avant achat</h2>${ul(CHECKLIST_ACHAT)}</article><article class="card"><h2>Éviter les escroqueries</h2>${ul(ANTI_ARNAQUE)}</article>`;
+    app.innerHTML = `<h1>Guides et modèles</h1>${chips([['guides', 'Guides'], ['modeles', 'Modèles'], ['listes', 'Listes et sécurité']], tab)}${body}`;
+    onChips(k => { tab = k; draw(); });
+    const gp = document.getElementById('gp'), gn = document.getElementById('gn');
+    if (gp) { gp.onclick = () => { gi--; draw(); scrollTo(0, 0); }; gn.onclick = () => { gi++; draw(); scrollTo(0, 0); }; }
+    app.querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(TEMPLATES[b.dataset.cp].text); b.textContent = 'Copié ✔'; } catch { b.textContent = 'Sélectionnez le texte'; } });
+  };
+  draw();
+};
+
+PAGES.premium = () => {
+  const exp = premiumExp();
+  wizard([
+    { title: 'Premium : 2 000 FCFA', html: () => `${exp ? `<p class="notice">Premium actif jusqu'au ${fdate(exp)}. Un nouveau paiement validé prolonge de 30 jours. <a href="#/pplus">Ouvrir mon Premium</a></p>` : ''}
+      <p><b>30 jours d'accès</b> à partir de la validation de votre paiement, sans renouvellement automatique.</p>${ul(['4 guides Premium (négociation, petites quantités, trésorerie, fidélisation)', '3 modèles de messages Premium', 'Simulateur de prix : bénéfice à −20 %, −10 %, 0, +10 %, +20 %'])}
+      <p class="meta">Aucun gain n'est garanti. Votre accès est enregistré sur cet appareil et activé après vérification de votre paiement par l'administrateur.</p>` },
+    { title: 'Payer avec Wave', html: () => `<p>1. Touchez le bouton, payez 2 000 FCFA dans Wave.</p><a class="btn" href="${WAVE}" target="_blank" rel="noopener noreferrer">Payer 2 000 FCFA avec Wave</a><p>2. Gardez la <b>référence de transaction</b> du reçu Wave, puis revenez ici et touchez Suivant.</p>` },
+    { title: 'Envoyer votre référence', html: () => `${input('p_r', 'Référence de transaction Wave', 'maxlength="64"')}<p class="meta">Nous vérifions le paiement dans le compte Wave, puis nous vous envoyons votre code d'accès sur WhatsApp. Aucune activation sur simple déclaration.</p>`,
+      next: c => { c.r = val('p_r'); if (c.r.length < 4) return 'Référence trop courte.'; window.open(WA + '?text=' + encodeURIComponent('Bonjour, paiement Premium NAVJ OPPORTUNITÉS (2 000 FCFA). Référence Wave : ' + c.r), '_blank', 'noopener'); } },
+    { title: 'Entrer votre code', last: 'Activer mon Premium', html: () => `${input('p_c', 'Code reçu sur WhatsApp', 'autocapitalize="off" autocomplete="off"')}<p class="meta">Le code est valable 7 jours après son envoi.</p>`,
+      next: async () => { const e = await redeem(val('p_c')); if (e) return e; location.hash = '#/pplus'; } },
+  ]);
+};
+
+PAGES.pplus = () => {
+  const exp = premiumExp();
+  if (!exp) { location.hash = '#/premium'; return; }
+  let tab = 'guides';
+  const draw = () => {
+    const body = tab === 'guides' ? PGUIDES.map(g => `<article class="card"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.summary)}</p><ol>${g.steps.map(s => '<li>' + esc(s) + '</li>').join('')}</ol></article>`).join('')
+      : tab === 'modeles' ? PTEMPLATES.map((t, i) => `<article class="card"><h2>${esc(t.title)}</h2><pre class="tpl">${esc(t.text)}</pre><button class="btn" data-cp="${i}">Copier</button></article>`).join('')
+        : `<div class="card form"><h2>Simulateur de prix</h2>${input('s_a', 'Prix d\'achat unitaire')}${input('s_q', 'Quantité')}${input('s_p', 'Prix de vente actuel')}${input('s_o', 'Autres frais totaux (facultatif)')}<button class="btn" id="sgo">Simuler</button><div id="so"></div><p class="meta">Calcul : bénéfice = ventes − achats − autres frais, pour 5 niveaux de prix. Estimation basée sur vos saisies uniquement.</p></div>`;
+    app.innerHTML = `<h1>⭐ Mon Premium</h1><p class="notice">Actif jusqu'au ${fdate(exp)}.</p>${chips([['guides', 'Guides'], ['modeles', 'Modèles'], ['sim', 'Simulateur']], tab)}${body}`;
+    onChips(k => { tab = k; draw(); });
+    app.querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(PTEMPLATES[b.dataset.cp].text); b.textContent = 'Copié ✔'; } catch { b.textContent = 'Sélectionnez le texte'; } });
+    const go = document.getElementById('sgo');
+    if (go) go.onclick = () => {
+      const a = parse(val('s_a'), false), q = parse(val('s_q'), false), p = parse(val('s_p'), false), o = parse(val('s_o'), true);
+      const rows = [-20, -10, 0, 10, 20].map(d => ({ d, price: p * (1 + d / 100), r: estimatedProfit({ unitPurchase: a, quantity: q, unitSelling: p * (1 + d / 100), otherCosts: o }) }));
+      const bad = rows.find(x => !x.r.ok);
+      document.getElementById('so').innerHTML = bad ? `<p class="notice" role="alert">${esc(bad.r.error)}</p>` : '<table class="tbl"><tr><th>Prix</th><th>Bénéfice</th><th>Marge</th></tr>' + rows.map(x => `<tr><td>${Math.round(x.price).toLocaleString('fr-FR')} (${x.d > 0 ? '+' : ''}${x.d} %)</td><td>${Math.round(x.r.value.profit).toLocaleString('fr-FR')}</td><td>${(Math.round(x.r.value.profitPct * 10) / 10).toLocaleString('fr-FR')} %</td></tr>`).join('') + '</table>';
+    };
+  };
+  draw();
+};
+
+function route() {
+  const [path, qs] = location.hash.replace(/^#\/?/, '').split('?');
+  const [page, arg] = path.split('/'), name = page || 'accueil';
+  app.classList.remove('page'); void app.offsetWidth; app.classList.add('page');
+  (PAGES[name] || (() => { app.innerHTML = '<p class="notice">Page introuvable.</p>'; }))(arg, new URLSearchParams(qs || '').get('q') || '');
+  const tabOf = { pplus: 'premium', vendre: 'boutique', recherche: 'accueil' }[name] || name;
+  document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('active', a.dataset.p === tabOf));
+  document.getElementById('back').hidden = name === 'accueil';
+  window.scrollTo(0, 0);
+}
+document.getElementById('back').onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/'; };
+window.addEventListener('hashchange', route);
+route();
+
+</script></body></html>
